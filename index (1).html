@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CS2 Underground Casino & Clicker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0e0f12;
+            --bg-card: #15171e;
+            --bg-lighter: #1e212b;
+            --primary: #ff9b00;
+            --primary-glow: rgba(255, 155, 0, 0.3);
+            
+            --milspec: #4b69ff;
+            --restricted: #8847ff;
+            --classified: #d32ce6;
+            --coverts: #eb4b4b;
+            --special: #e4ae39;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Rajdhani', sans-serif;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Container Mobilny */
+        .phone-container {
+            width: 100vw;
+            height: 100vh;
+            max-width: 430px;
+            max-height: 880px;
+            background-color: #111217;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+            overflow: hidden;
+        }
+
+        @media (min-width: 430px) {
+            .phone-container {
+                border-radius: 20px;
+                height: 95vh;
+                border: 3px solid #232630;
+            }
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: linear-gradient(180deg, var(--bg-card) 0%, #111217 100%);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #1e212b;
+            z-index: 10;
+        }
+
+        .balance-box {
+            display: flex;
+            flex-direction: column;
+        }
+        .balance-label {
+            font-size: 12px;
+            color: #6c7283;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .balance-amount {
+            font-size: 26px;
+            font-weight: 700;
+            color: #4eff7b;
+            text-shadow: 0 0 10px rgba(78,255,123,0.2);
+        }
+
+        .rank-box {
+            text-align: right;
+        }
+        .rank-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            text-shadow: 0 0 8px var(--primary-glow);
+        }
+        .rank-sub {
+            font-size: 11px;
+            color: #8a90a6;
+        }
+
+        /* Content Context */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            padding-bottom: 90px;
+        }
+
+        .view {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- WIDOK 1: MECZ & ULEPSZENIA --- */
+        .click-section {
+            background: radial-gradient(circle, #1a1c24 0%, var(--bg-card) 100%);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #232630;
+            margin-bottom: 15px;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+        .click-btn {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #252836 0%, #15171e 100%);
+            border: 4px solid var(--primary);
+            box-shadow: 0 0 20px var(--primary-glow);
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: transform 0.05s, box-shadow 0.2s;
+            outline: none;
+        }
+        .click-btn:active {
+            transform: scale(0.94);
+            box-shadow: 0 0 30px var(--primary);
+        }
+        .floating-text {
+            position: absolute;
+            color: #4eff7b;
+            font-weight: 700;
+            font-size: 22px;
+            pointer-events: none;
+            animation: floatUp 0.6s ease-out forwards;
+            text-shadow: 0 0 5px rgba(0,0,0,0.8);
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-70px) scale(0.8); opacity: 0; }
+        }
+
+        .upgrades-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .upgrade-card {
+            background: var(--bg-card);
+            border: 1px solid #232630;
+            border-radius: 10px;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .up-info h4 { font-size: 16px; font-weight: 600; color: #fff; }
+        .up-info p { font-size: 12px; color: #73798c; }
+        .buy-btn {
+            background: var(--primary);
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255,155,0,0.2);
+        }
+        .buy-btn:disabled {
+            background: #2b2e3a;
+            color: #555;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* --- WIDOK 2: KASYNO (CRASH & COINFLIP) --- */
+        .casino-tabs {
+            display: flex;
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 15px;
+            border: 1px solid #232630;
+        }
+        .casino-tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #73798c;
+            padding: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .casino-tab-btn.active {
+            background: var(--bg-lighter);
+            color: var(--primary);
+        }
+
+        /* Widok Crash */
+        .crash-area {
+            background: #090a0d;
+            border-radius: 12px;
+            height: 200px;
+            border: 1px solid #1c1f2b;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        .crash-multiplier {
+            font-size: 48px;
+            font-weight: 700;
+            color: #fff;
+            z-index: 2;
+            transition: color 0.1s;
+        }
+        .crash-multiplier.crashed { color: #ff4e4e; }
+        .crash-multiplier.live { color: #4eff7b; }
+        
+        .crash-status {
+            font-size: 14px;
+            color: #6c7283;
+            margin-top: 5px;
+            z-index: 2;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .crash-graph-canvas {
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            opacity: 0.2;
+        }
+
+        .bet-controls {
+            background: var(--bg-card);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #232630;
+        }
+        .input-group {
+            margin-bottom: 12px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            color: #6c7283;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+        .input-wrapper {
+            display: flex;
+            background: #090a0d;
+            border: 1px solid #232630;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .input-wrapper input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 10px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            outline: none;
+        }
+        .quick-bet-btn {
+            background: var(--bg-lighter);
+            border: none;
+            color: #fff;
+            padding: 0 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border-left: 1px solid #232630;
+        }
+
+        /* Coinflip */
+        .coin-box {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 700;
+            border: 4px solid #fff;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        .coin-t { background: #eb4b4b; border-color: #b83232; color: #fff; }
+        .coin-ct { background: #4b69ff; border-color: #324bb8; color: #fff; }
+
+        .side-picker {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .side-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            color: #fff;
+            cursor: pointer;
+            opacity: 0.4;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+        .side-btn.t { background: #eb4b4b; }
+        .side-btn.ct { background: #4b69ff; }
+        .side-btn.active { opacity: 1; box-shadow: 0 0 15px rgba(255,255,255,0.2); border: 2px solid #fff; }
+
+        /* --- WIDOK 3: SKRZYNKI --- */
+        .case-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #232630;
+            margin-bottom: 15px;
+        }
+        .case-card h3 { font-size: 20px; margin-bottom: 4px; font-weight: 700; }
+        .case-card p { color: #4eff7b; font-weight: 700; margin-bottom: 15px; font-size: 16px; }
+
+        .roulette-container {
+            width: 100%;
+            height: 95px;
+            background: #090a0d;
+            border: 2px solid #232630;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        .roulette-pointer {
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 4px; height: 100%;
+            background: var(--primary);
+            z-index: 10;
+            box-shadow: 0 0 10px var(--primary);
+        }
+        .roulette-track {
+            display: flex;
+            position: absolute;
+            left: 0; top: 0; height: 100%;
+        }
+        .roulette-item {
+            width: 95px; height: 100%;
+            flex-shrink: 0;
+            border-right: 1px solid #111217;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* --- WIDOK 4: EKWIPUNEK & RYNEK --- */
+        .inv-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-card);
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid #232630;
+            margin-bottom: 15px;
+        }
+        .inv-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .inv-item {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            font-size: 12px;
+            position: relative;
+            border: 1px solid #232630;
+            border-bottom: 4px solid #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 105px;
+        }
+        .item-glow-rar {
+            font-weight: 700;
+            height: 34px;
+            overflow: hidden;
+            line-height: 1.1;
+        }
+        .inv-item .price {
+            color: #4eff7b;
+            font-weight: 700;
+            margin-top: 3px;
+        }
+        .st-badge {
+            background: #ff6a00;
+            color: #000;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 1px 4px;
+            border-radius: 3px;
+            position: absolute;
+            top: 4px; left: 4px;
+        }
+        .action-item-btn {
+            background: rgba(255,255,255,0.08);
+            border: none;
+            color: #ccc;
+            font-size: 10px;
+            padding: 4px 0;
+            border-radius: 4px;
+            margin-top: 4px;
+            width: 100%;
+            cursor: pointer;
+        }
+        .action-item-btn:hover {
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+        }
+
+        /* Dolny pasek nawigacji */
+        .nav-bar {
+            position: absolute;
+            bottom: 0; left: 0; width: 100%;
+            height: 70px;
+            background-color: var(--bg-card);
+            border-top: 2px solid #1e212b;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 10;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #6c7283;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            flex: 1;
+            padding: 12px 0;
+            transition: color 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .nav-item.active {
+            color: var(--primary);
+        }
+        .nav-icon {
+            font-size: 22px;
+            margin-bottom: 2px;
+        }
+
+        /* Kolory Rzadkości i Poświaty */
+        .rar-milspec { background: rgba(75, 105, 255, 0.08); border-color: var(--milspec) !important; color: #a4b4ff; }
+        .rar-restricted { background: rgba(136, 71, 255, 0.08); border-color: var(--restricted) !important; color: #caa4ff; }
+        .rar-classified { background: rgba(213, 44, 230, 0.08); border-color: var(--classified) !important; color: #f5a4ff; }
+        .rar-covert { background: rgba(235, 75, 75, 0.08); border-color: var(--coverts) !important; color: #ffa4a4; box-shadow: inset 0 0 10px rgba(235, 75, 75, 0.2); }
+        .rar-special { 
+            background: rgba(228, 174, 57, 0.12); 
+            border-color: var(--special) !important; 
+            color: #ffe4a4; 
+            box-shadow: inset 0 0 15px rgba(228, 174, 57, 0.3);
+            animation: pulseGold 2s infinite ease-in-out; 
+        }
+
+        @keyframes pulseGold {
+            0% { box-shadow: inset 0 0 10px rgba(228,174,57,0.2), 0 0 5px rgba(228,174,57,0.1); }
+            50% { box-shadow: inset 0 0 20px rgba(228,174,57,0.4), 0 0 12px rgba(228,174,57,0.3); }
+            100% { box-shadow: inset 0 0 10px rgba(228,174,57,0.2), 0 0 5px rgba(228,174,57,0.1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container">
+        <!-- TOP BAR -->
+        <div class="top-bar">
+            <div class="balance-box">
+                <span class="balance-label">Twój Bilans</span>
+                <span class="balance-amount" id="balance-display">10.00 €</span>
+            </div>
+            <div class="rank-box">
+                <span class="rank-title" id="rank-display">Silver I</span>
+                <div class="rank-sub" id="networth-display">Majątek: 10.00 €</div>
+            </div>
+        </div>
+
+        <!-- MAIN WINDOW VIEWPORT -->
+        <div class="main-content">
+            
+            <!-- WIDOK 1: KLIKER & UPGRADES -->
+            <div id="view-match" class="view active">
+                <div class="click-section" id="click-zone">
+                    <button class="click-btn" onclick="handleClick(event)">GRAJ MECZ</button>
+                </div>
+                <div class="shop-title" style="font-size:14px; color:#6c7283; letter-spacing:1px; margin-bottom:8px; text-transform:uppercase;">Kontrakty i Pasywne Przychody</div>
+                <div class="upgrades-container" id="upgrades-list"></div>
+            </div>
+
+            <!-- WIDOK 2: HAZARD (CRASH & COINFLIP) -->
+            <div id="view-casino" class="view">
+                <div class="casino-tabs">
+                    <button class="casino-tab-btn active" id="tab-crash" onclick="switchCasinoMode('crash')">CRASH GAME</button>
+                    <button class="casino-tab-btn" id="tab-coinflip" onclick="switchCasinoMode('coinflip')">COINFLIP</button>
+                </div>
+
+                <!-- Pod-widok Crash -->
+                <div id="casino-crash-section">
+                    <div class="crash-area">
+                        <div class="crash-multiplier live" id="crash-mult">1.00x</div>
+                        <div class="crash-status" id="crash-status">Oczekiwanie na zakład</div>
+                    </div>
+                    <div class="bet-controls">
+                        <div class="input-group">
+                            <label>Kwota Zakładu (€)</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="crash-bet-amount" value="2.00" min="0.1" step="0.5">
+                                <button class="quick-bet-btn" onclick="adjustBet('crash', 0.5)">1/2</button>
+                                <button class="quick-bet-btn" onclick="adjustBet('crash', 2)">X2</button>
+                            </div>
+                        </div>
+                        <button class="buy-btn" id="crash-action-btn" style="width:100%; padding:14px; background:#4eff7b; font-size:16px;" onclick="handleCrashAction()">POSTAW ZAKŁAD</button>
+                    </div>
+                </div>
+
+                <!-- Pod-widok Coinflip -->
+                <div id="casino-coinflip-section" style="display: none;">
+                    <div class="bet-controls" style="margin-bottom:15px; text-align:center;">
+                        <label style="display:block; font-size:12px; color:#6c7283; text-transform:uppercase; margin-bottom:8px;">Wybierz stronę konfliktu</label>
+                        <div class="side-picker">
+                            <button class="side-btn t active" id="flip-side-t" onclick="selectFlipSide('T')">TERRORYŚCI</button>
+                            <button class="side-btn ct" id="flip-side-ct" onclick="selectFlipSide('CT')">ANTYTERRORYŚCI</button>
+                        </div>
+                        <div class="coin-box coin-t" id="coin-graphic">T</div>
+                    </div>
+                    <div class="bet-controls">
+                        <div class="input-group">
+                            <label>Wartość zakładu monetą (€)</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="coinflip-bet-amount" value="5.00" min="0.5" step="1">
+                                <button class="quick-bet-btn" onclick="adjustBet('flip', 0.5)">1/2</button>
+                                <button class="quick-bet-btn" onclick="adjustBet('flip', 2)">X2</button>
+                            </div>
+                        </div>
+                        <button class="buy-btn" style="width:100%; padding:14px; background:var(--primary);" onclick="playCoinflip()">URUCHOM RZUT MONETĄ</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WIDOK 3: SKRZYNKI -->
+            <div id="view-cases" class="view">
+                <div class="case-card">
+                    <h3>Skrzynia Rewolucji CS2</h3>
+                    <p>Cena: 2.50 €</p>
+                    <button class="buy-btn" style="width:100%; padding:14px; font-size:16px;" id="case-open-btn" onclick="openCase()">OTWÓRZ SKRZYNKĘ</button>
+                </div>
+                <div class="roulette-container">
+                    <div class="roulette-pointer"></div>
+                    <div class="roulette-track" id="roulette-track"></div>
+                </div>
+            </div>
+
+            <!-- WIDOK 4: EKWIPUNEK -->
+            <div id="view-inventory" class="view">
+                <div class="inv-summary">
+                    <div>Przedmioty: <span id="inv-count-label" style="font-weight:700;">0</span>/120</div>
+                    <button class="buy-btn" style="background:#eb4b4b; color:#fff; padding:6px 12px; font-size:12px;" onclick="sellAllItems()">SPRZEDAJ WSZYSTKO</button>
+                </div>
+                <div class="inv-grid" id="inv-grid"></div>
+            </div>
+
+        </div>
+
+        <!-- NAVIGATION BOTTOM BAR -->
+        <div class="nav-bar">
+            <div class="nav-item active" onclick="navigate('match', this)">
+                <div class="nav-icon">🎮</div>
+                <div>Mecz</div>
+            </div>
+            <div class="nav-item" onclick="navigate('casino', this)">
+                <div class="nav-icon">🎰</div>
+                <div>Hazard</div>
+            </div>
+            <div class="nav-item" onclick="navigate('cases', this)">
+                <div class="nav-icon">📦</div>
+                <div>Skrzynie</div>
+            </div>
+            <div class="nav-item" onclick="navigate('inventory', this)">
+                <div class="nav-icon">🎒</div>
+                <div>Ekwipunek</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- STAN GRY ---
+        let state = {
+            balance: 25.00,
+            clickPower: 1.00,
+            eps: 0.00,
+            inventory: [],
+            rank: "Silver I",
+            // Hazard states
+            casinoMode: 'crash',
+            flipSide: 'T',
+            crash: {
+                state: 'idle', // 'idle', 'running', 'crashed'
+                multiplier: 1.00,
+                bet: 0.00,
+                targetCrash: 0.00
+            }
+        };
+
+        // --- PULA SKINÓW ---
+        const skins = [
+            { name: "P250 | Valence", price: 0.40, rar: "rar-milspec" },
+            { name: "Glock-18 | Bunsen Burner", price: 0.65, rar: "rar-milspec" },
+            { name: "SG 553 | Aerial", price: 0.90, rar: "rar-milspec" },
+            { name: "M4A1-S | Flashback", price: 2.50, rar: "rar-restricted" },
+            { name: "AK-47 | Uncharted", price: 3.80, rar: "rar-restricted" },
+            { name: "Glock-18 | Vogue", price: 5.20, rar: "rar-restricted" },
+            { name: "AWP | Atheris", price: 9.50, rar: "rar-classified" },
+            { name: "M4A4 | Neo-Noir", price: 28.00, rar: "rar-classified" },
+            { name: "Desert Eagle | Code Red", price: 42.00, rar: "rar-covert" },
+            { name: "AK-47 | Neon Rider", price: 78.00, rar: "rar-covert" },
+            { name: "AWP | Asiimov", price: 145.00, rar: "rar-covert" },
+            { name: "★ Gut Knife | Autotronic", price: 220.00, rar: "rar-special" },
+            { name: "★ Karambit | Doppler", price: 850.00, rar: "rar-special" },
+            { name: "★ Butterfly Knife | Fade", price: 1600.00, rar: "rar-special" }
+        ];
+
+        // --- ULEPSZENIA ---
+        const upgrades = [
+            { id: "click_1", name: "Lepsza Myszka", cost: 15, power: 0.5, eps: 0, count: 0 },
+            { id: "bot_1", name: "Bot Asystujący", cost: 50, power: 0, eps: 1.2, count: 0 },
+            { id: "click_2", name: "Klawiatura Pro", cost: 200, power: 3.0, eps: 0, count: 0 },
+            { id: "bot_2", name: "Młody Talent", cost: 650, power: 0, eps: 8.5, count: 0 },
+            { id: "team", name: "Własna Drużyna", cost: 2500, power: 15.0, eps: 45.0, count: 0 }
+        ];
+
+        // Rangi e-sportowe
+        const ranks = [
+            { name: "Silver I", min: 0 },
+            { name: "Silver Elite Master", min: 100 },
+            { name: "Gold Nova III", min: 500 },
+            { name: "Master Guardian Elite", min: 2500 },
+            { name: "Legendary Eagle", min: 10000 },
+            { name: "The Global Elite", min: 50000 }
+        ];
+
+        // --- DŹWIĘKI GENEROWANE Z KODU (Audio Context) ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playBeep(freq, type, duration) {
+            try {
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = type || 'sine';
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
+        }
+
+        // --- SYSTEM ZAPISU (Local Storage) ---
+        function saveGame() {
+            const data = {
+                balance: state.balance,
+                inventory: state.inventory,
+                upgrades: upgrades.map(u => ({ id: u.id, count: u.count, cost: u.cost }))
+            };
+            localStorage.setItem('cs2_casino_save', JSON.stringify(data));
+        }
+
+        function loadGame() {
+            const saved = localStorage.getItem('cs2_casino_save');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    state.balance = parsed.balance || 25.00;
+                    state.inventory = parsed.inventory || [];
+                    if (parsed.upgrades) {
+                        parsed.upgrades.forEach(su => {
+                            let u = upgrades.find(up => up.id === su.id);
+                            if (u) {
+                                u.count = su.count;
+                                u.cost = su.cost;
+                            }
+                        });
+                    }
+                } catch(e) {}
+            }
+            recalcStats();
+            updateUI();
+        }
+
+        // --- EKONOMIA I LOGIKA KLIKANIA ---
+        function handleClick(e) {
+            state.balance += state.clickPower;
+            updateUI();
+            saveGame();
+
+            // Animacja tekstu +X.XX €
+            const zone = document.getElementById('click-zone');
+            const floating = document.createElement('div');
+            floating.className = 'floating-text';
+            floating.innerText = `+${state.clickPower.toFixed(2)} €`;
+            
+            const rect = zone.getBoundingClientRect();
+            floating.style.left = `${e.clientX - rect.left - 20}px`;
+            floating.style.top = `${e.clientY - rect.top - 20}px`;
+            
+            zone.appendChild(floating);
+            playBeep(400, 'sine', 0.08);
+            setTimeout(() => floating.remove(), 600);
+        }
+
+        function buyUpgrade(id) {
+            let u = upgrades.find(up => up.id === id);
+            if (u && state.balance >= u.cost) {
+                state.balance -= u.cost;
+                u.count++;
+                u.cost = Math.round(u.cost * 1.35);
+                recalcStats();
+                renderUpgrades();
+                updateUI();
+                saveGame();
+                playBeep(600, 'triangle', 0.15);
+            }
+        }
+
+        function recalcStats() {
+            let addPower = 1.00;
+            let addEps = 0.00;
+            upgrades.forEach(u => {
+                addPower += u.count * u.power;
+                addEps += u.count * u.eps;
+            });
+            state.clickPower = addPower;
+            state.eps = addEps;
+        }
+
+        function renderUpgrades() {
+            const list = document.getElementById('upgrades-list');
+            list.innerHTML = '';
+            upgrades.forEach(u => {
+                const canBuy = state.balance >= u.cost;
+                list.innerHTML += `
+                    <div class="upgrade-card">
+                        <div class="up-info">
+                            <h4>${u.name} [x${u.count}]</h4>
+                            <p>${u.power > 0 ? `+${u.power} €/klik` : `+${u.eps} €/sek`} | Cena: ${u.cost} €</p>
+                        </div>
+                        <button class="buy-btn" ${canBuy ? '' : 'disabled'} onclick="buyUpgrade('${u.id}')">Kup</button>
+                    </div>
+                `;
+            });
+        }
+
+        // --- SKRZYNKI (ROULETTE) ---
+        function openCase() {
+            if (state.balance < 2.50 || state.isRolling) return;
+            state.balance -= 2.50;
+            state.isRolling = true;
+            document.getElementById('case-open-btn').disabled = true;
+            updateUI();
+
+            const track = document.getElementById('roulette-track');
+            track.innerHTML = '';
+            track.style.transition = 'none';
+            track.style.transform = 'translateX(0px)';
+
+            let items = [];
+            for (let i = 0; i < 35; i++) {
+                // Skomplikowane wagi rzadkości
+                let rand = Math.random() * 100;
+                let rolledSkin;
+                if (rand < 0.25) rolledSkin = skins.filter(s => s.rar === 'rar-special')[Math.floor(Math.random() * skins.filter(s => s.rar === 'rar-special').length)];
+                else if (rand < 2.5) rolledSkin = skins.filter(s => s.rar === 'rar-covert')[Math.floor(Math.random() * skins.filter(s => s.rar === 'rar-covert').length)];
+                else if (rand < 12) rolledSkin = skins.filter(s => s.rar === 'rar-classified')[Math.floor(Math.random() * skins.filter(s => s.rar === 'rar-classified').length)];
+                else if (rand < 35) rolledSkin = skins.filter(s => s.rar === 'rar-restricted')[Math.floor(Math.random() * skins.filter(s => s.rar === 'rar-restricted').length)];
+                else rolledSkin = skins.filter(s => s.rar === 'rar-milspec')[Math.floor(Math.random() * skins.filter(s => s.rar === 'rar-milspec').length)];
+
+                // Fallback w razie pustego filtra
+                if (!rolledSkin) rolledSkin = skins[0];
+
+                let itemCopy = { ...rolledSkin };
+                items.push(itemCopy);
+
+                track.innerHTML += `
+                    <div class="roulette-item ${itemCopy.rar}">
+                        <div style="font-size:10px; opacity:0.6; text-transform:uppercase;">${itemCopy.name.split(' | ')[0]}</div>
+                        <div class="item-glow-rar">${itemCopy.name.split(' | ')[1] || itemCopy.name}</div>
+                    </div>
+                `;
+            }
+
+            let winnerIdx = 28;
+            let winner = items[winnerIdx];
+
+            // Szansa na wersję StatTrak (12%)
+            if (Math.random() < 0.12) {
+                winner.isStatTrak = true;
+                winner.price = Math.round(winner.price * 2.8);
+                winner.name = "StatTrak™ " + winner.name;
+            }
+
+            // Dźwięk przeskakiwania taśmy
+            let tickCount = 0;
+            let tickInterval = setInterval(() => {
+                tickCount++;
+                if(tickCount < 25) playBeep(550 - (tickCount * 5), 'sine', 0.03);
+                else clearInterval(tickInterval);
+            }, 130);
+
+            setTimeout(() => {
+                track.style.transition = 'transform 4.2s cubic-bezier(0.08, 0.6, 0.12, 1)';
+                let viewWidth = window.innerWidth > 430 ? 430 : window.innerWidth;
+                let offset = -(winnerIdx * 95) + (viewWidth / 2) - 48;
+                track.style.transform = `translateX(${offset}px)`;
+            }, 50);
+
+            setTimeout(() => {
+                state.inventory.push(winner);
+                state.isRolling = false;
+                document.getElementById('case-open-btn').disabled = false;
+                
+                if (winner.rar === 'rar-special' || winner.rar === 'rar-covert') {
+                    playBeep(880, 'sine', 0.4);
+                    setTimeout(() => playBeep(1100, 'sine', 0.5), 150);
+                } else {
+                    playBeep(700, 'sine', 0.2);
+                }
+
+                updateUI();
+                renderInventory();
+                saveGame();
+            }, 4300);
+        }
+
+        // --- HAZARD: CRASH ENGINE ---
+        let crashLoop;
+        function handleCrashAction() {
+            const betInput = document.getElementById('crash-bet-amount');
+            let betVal = parseFloat(betInput.value);
+
+            if (state.crash.state === 'idle') {
+                if (isNaN(betVal) || betVal <= 0 || betVal > state.balance) {
+                    alert("Nieprawidłowa kwota zakładu!");
+                    return;
+                }
+                // Start Crash Game
+                state.balance -= betVal;
+                state.crash.bet = betVal;
+                state.crash.state = 'running';
+                state.crash.multiplier = 1.00;
+                
+                // Generowanie punktu wybuchu (Crash Point algorytm kasynowy)
+                let e = Math.random() * 100;
+                if (e < 4) state.crash.targetCrash = 1.00; // instant crash 4% szans
+                else {
+                    state.crash.targetCrash = parseFloat((97 / (100 - e)).toFixed(2));
+                    if (state.crash.targetCrash < 1.01) state.crash.targetCrash = 1.01;
+                }
+
+                document.getElementById('crash-action-btn').innerText = "WYPŁAĆ (CASH OUT)";
+                document.getElementById('crash-action-btn').style.background = "#ff9b00";
+                document.getElementById('crash-status').innerText = "Wykres rośnie...";
+                document.getElementById('crash-mult').className = "crash-multiplier live";
+                
+                updateUI();
+
+                crashLoop = setInterval(() => {
+                    if (state.crash.multiplier >= state.crash.targetCrash) {
+                        // CRASHED!
+                        clearInterval(crashLoop);
+                        state.crash.state = 'crashed';
+                        document.getElementById('crash-mult').className = "crash-multiplier crashed";
+                        document.getElementById('crash-mult').innerText = state.crash.multiplier.toFixed(2) + "x";
+                        document.getElementById('crash-status').innerText = "BUM! Wykres eksplodował!";
+                        document.getElementById('crash-action-btn').innerText = "POSTAW ZAKŁAD";
+                        document.getElementById('crash-action-btn').style.background = "#4eff7b";
+                        playBeep(180, 'sawtooth', 0.4);
+                        
+                        setTimeout(() => {
+                            state.crash.state = 'idle';
+                            document.getElementById('crash-status').innerText = "Oczekiwanie na zakład";
+                        }, 2000);
+                    } else {
+                        // Wzrost mnożnika
+                        if (state.crash.multiplier < 2) state.crash.multiplier += 0.02;
+                        else if (state.crash.multiplier < 5) state.crash.multiplier += 0.05;
+                        else state.crash.multiplier += 0.15;
+                        
+                        state.crash.multiplier = parseFloat(state.crash.multiplier.toFixed(2));
+                        document.getElementById('crash-mult').innerText = state.crash.multiplier.toFixed(2) + "x";
+                        playBeep(300 + (state.crash.multiplier * 20), 'sine', 0.02);
+                    }
+                }, 80);
+
+            } else if (state.crash.state === 'running') {
+                // Wypłata z zyskiem
+                clearInterval(crashLoop);
+                let winAmount = state.crash.bet * state.crash.multiplier;
+                state.balance += winAmount;
+                
+                state.crash.state = 'idle';
+                document.getElementById('crash-status').innerText = `Wypłacono pomyślnie! Zysk: +${winAmount.toFixed(2)} €`;
+                document.getElementById('crash-action-btn').innerText = "POSTAW ZAKŁAD";
+                document.getElementById('crash-action-btn').style.background = "#4eff7b";
+                playBeep(900, 'sine', 0.2);
+
+                updateUI();
+                saveGame();
+            }
+        }
+
+        // --- HAZARD: COINFLIP ---
+        function selectFlipSide(side) {
+            state.flipSide = side;
+            document.getElementById('flip-side-t').classList.toggle('active', side === 'T');
+            document.getElementById('flip-side-ct').classList.toggle('active', side === 'CT');
+            playBeep(450, 'sine', 0.05);
+        }
+
+        function playCoinflip() {
+            const betInput = document.getElementById('coinflip-bet-amount');
+            let betVal = parseFloat(betInput.value);
+
+            if (isNaN(betVal) || betVal <= 0 || betVal > state.balance) {
+                alert("Nie posiadasz wystarczających środków!");
+                return;
+            }
+
+            state.balance -= betVal;
+            updateUI();
+
+            let coin = document.getElementById('coin-graphic');
+            let sides = ['T', 'CT'];
+            let result = sides[Math.floor(Math.random() * 2)];
+
+            // Animacja rotacji CSS
+            coin.style.transition = 'transform 1.2s cubic-bezier(0.12, 0.8, 0.2, 1)';
+            coin.style.transform = 'rotateY(1440deg)';
+
+            let spinInterval = setInterval(() => {
+                playBeep(600, 'square', 0.02);
+            }, 100);
+
+            setTimeout(() => {
+                clearInterval(spinInterval);
+                coin.style.transition = 'none';
+                coin.style.transform = 'rotateY(0deg)';
+                coin.innerText = result;
+                coin.className = `coin-box coin-${result.toLowerCase()}`;
+
+                if (state.flipSide === result) {
+                    let winnings = betVal * 1.95; // 5% podatku kasyna dla balansu rozgrywki
+                    state.balance += winnings;
+                    playBeep(850, 'sine', 0.25);
+                    alert(`Wygrana! Strona ${result} zwycięża. Zarabiasz ${winnings.toFixed(2)} €!`);
+                } else {
+                    playBeep(220, 'sawtooth', 0.3);
+                    alert(`Przegrana. Wypadła strona ${result}. Tracisz postawione środki.`);
+                }
+
+                updateUI();
+                saveGame();
+            }, 1200);
+        }
+
+        function switchCasinoMode(mode) {
+            state.casinoMode = mode;
+            document.getElementById('tab-crash').classList.toggle('active', mode === 'crash');
+            document.getElementById('tab-coinflip').classList.toggle('active', mode === 'coinflip');
+            document.getElementById('casino-crash-section').style.display = mode === 'crash' ? 'block' : 'none';
+            document.getElementById('casino-coinflip-section').style.display = mode === 'coinflip' ? 'block' : 'none';
+        }
+
+        function adjustBet(type, factor) {
+            let input = document.getElementById(type === 'crash' ? 'crash-bet-amount' : 'coinflip-bet-amount');
+            let val = parseFloat(input.value);
+            if (!isNaN(val)) {
+                if (factor === 0.5) input.value = (val / 2).toFixed(2);
+                if (factor === 2) input.value = (val * 2).toFixed(2);
+            }
+        }
+
+        // --- EKWIPUNEK & WARTOSĆ MAJĄTKU ---
+        function renderInventory() {
+            const grid = document.getElementById('inv-grid');
+            grid.innerHTML = '';
+            document.getElementById('inv-count-label').innerText = state.inventory.length;
+
+            state.inventory.forEach((item, index) => {
+                grid.innerHTML += `
+                    <div class="inv-item ${item.rar}">
+                        ${item.isStatTrak ? '<span class="st-badge">ST</span>' : ''}
+                        <div class="item-glow-rar">${item.name.replace("StatTrak™ ", "")}</div>
+                        <div>
+                            <div class="price">${item.price.toFixed(2)} €</div>
+                            <button class="action-item-btn" onclick="sellItem(${index})">Sprzedaj</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function sellItem(index) {
+            state.balance += state.inventory[index].price;
+            state.inventory.splice(index, 1);
+            playBeep(650, 'sine', 0.08);
+            updateUI();
+            renderInventory();
+            saveGame();
+        }
+
+        function sellAllItems() {
+            if (state.inventory.length === 0) return;
+            let sum = state.inventory.reduce((acc, i) => acc + i.price, 0);
+            state.balance += sum;
+            state.inventory = [];
+            playBeep(750, 'sine', 0.15);
+            updateUI();
+            renderInventory();
+            saveGame();
+        }
+
+        // --- ZMIANA WIDOKÓW (NAWIGACJA) ---
+        function navigate(viewId, element) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById(`view-${viewId}`).classList.add('active');
+            element.classList.add('active');
+            playBeep(500, 'sine', 0.04);
+            
+            if(viewId === 'inventory') renderInventory();
+            if(viewId === 'match') renderUpgrades();
+        }
+
+        // --- UI & AKTUALIZACJA RANŻY ---
+        function updateUI() {
+            document.getElementById('balance-display').innerText = `${state.balance.toFixed(2)} €`;
+            
+            // Obliczanie całkowitego majątku (balans + wartość itemów)
+            let invValue = state.inventory.reduce((acc, i) => acc + i.price, 0);
+            let netWorth = state.balance + invValue;
+            document.getElementById('networth-display').innerText = `Majątek: ${netWorth.toFixed(2)} €`;
+
+            // Dobieranie rangi na podstawie majątku
+            let currentRank = ranks[0].name;
+            ranks.forEach(r => {
+                if (netWorth >= r.min) currentRank = r.name;
+            });
+            state.rank = currentRank;
+            document.getElementById('rank-display').innerText = state.rank;
+            
+            // Aktywacja/dezaktywacja przycisków kupna w sklepie w czasie rzeczywistym
+            upgrades.forEach(u => {
+                let btn = document.querySelector(`button[onclick="buyUpgrade('${u.id}')"]`);
+                if (btn) btn.disabled = state.balance < u.cost;
+            });
+        }
+
+        // --- GŁÓWNA PĘTLA GRY (ZAROBKI PASYWNE + DYNAMICZNY RYNEK) ---
+        setInterval(() => {
+            // EPS / 10 bo pętla wykonuje się co 100ms
+            state.balance += state.eps / 10;
+            updateUI();
+        }, 100);
+
+        // Fluktuacja cen skinów na rynku (co 7 sekund)
+        setInterval(() => {
+            if (state.inventory.length > 0) {
+                state.inventory.forEach(item => {
+                    // Zmiana ceny o max +/- 4%
+                    let pct = 1 + ((Math.random() * 8 - 4) / 100);
+                    item.price = parseFloat((item.price * pct).toFixed(2));
+                    if (item.price < 0.1) item.price = 0.1;
+                });
+                if (document.getElementById('view-inventory').classList.contains('active')) {
+                    renderInventory();
+                }
+                updateUI();
+            }
+        }, 7000);
+
+        // --- START UP ---
+        loadGame();
+        renderUpgrades();
+    </script>
+</body>
+</html>
